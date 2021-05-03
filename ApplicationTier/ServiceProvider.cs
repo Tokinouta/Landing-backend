@@ -65,13 +65,17 @@ namespace ApplicationTier
 
         async public void StartHubConnection(string hubUrl)
         {
-            Connection = new HubConnectionBuilder()
-                .WithUrl(hubUrl)
-                .Build();
-            await Connection.StartAsync();
-            Console.WriteLine(Connection.State);
-            if (Connection.State == HubConnectionState.Connected)
+            if (Connection?.State == HubConnectionState.Connected)
             {
+                Console.WriteLine("connection already started");
+            }
+            else
+            {
+                Connection = new HubConnectionBuilder()
+                              .WithUrl(hubUrl)
+                              .Build();
+                await Connection.StartAsync();
+                Console.WriteLine(Connection.State);
                 Console.WriteLine("connection started");
             }
         }
