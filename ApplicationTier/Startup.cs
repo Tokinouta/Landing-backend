@@ -1,4 +1,5 @@
 using ApplicationTier.Hubs;
+using HistoryDemo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,6 +39,7 @@ namespace ApplicationTier
             });
             services.AddSingleton(Configuration);
             services.AddSingleton<IServiceProvider, SimulationWrapper>();
+            services.AddDbContext<AppDbContext>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
