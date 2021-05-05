@@ -16,35 +16,32 @@ namespace ApplicationTier
     public interface IServiceProvider
     {
         public Simulation Simulation { get; set; }
-        public ConcurrentQueue<double> DataQueue { get; set; }
+        public ConcurrentQueue<DataToSend> DataQueue { get; set; }
         public System.Timers.Timer DataSendTimer { get; set; }
         public HubConnection Connection { get; set; }
 
         public void StartHubConnection(string hubUrl);
-
         public Task SendData();
-
         public void StartSimulation();
         public void Reset();
-
         public void SaveToDatabase(Initialization ini, ModelEntities.Configuration conf);
 
     }
 
-    class ServiceProvider : IServiceProvider
+    class SimulationWrapper : IServiceProvider
     {
         public Simulation Simulation { get; set; }
-        public ConcurrentQueue<double> DataQueue { get; set; }
+        public ConcurrentQueue<DataToSend> DataQueue { get; set; }
         public System.Timers.Timer DataSendTimer { get; set; }
         public HubConnection Connection { get; set; }
 
-        public ServiceProvider()
+        public SimulationWrapper()
         {
             Simulation = new Simulation();
             DataSendTimer = new System.Timers.Timer(100);
             DataSendTimer.Elapsed += (sender, e) =>
             {
-                if (DataQueue.TryDequeue(out double data))
+                if (DataQueue.TryDequeue(out DataToSend data))
                 {
                     Connection.InvokeAsync("SendData", "user", data);
                 }
@@ -54,11 +51,11 @@ namespace ApplicationTier
                     Console.WriteLine("Timer Stoped");
                 }
             };
-            DataQueue = new ConcurrentQueue<double>();
+            DataQueue = new ConcurrentQueue<DataToSend>();
             //Simulation.Record.SaveToDatabase += SaveToDatabase;
         }
 
-        ~ServiceProvider()
+        ~SimulationWrapper()
         {
             DataSendTimer.Dispose();
         }
@@ -84,7 +81,7 @@ namespace ApplicationTier
         {
             return new Task(() =>
             {
-                if (DataQueue.TryDequeue(out double data))
+                if (DataQueue.TryDequeue(out DataToSend data))
                 {
                     Connection.InvokeAsync("SendData", "user", data);
                 }
@@ -126,6 +123,7 @@ namespace ApplicationTier
         public void Reset()
         {
             Simulation.Reset();
+            DataQueue.Clear();
         }
     }
 }

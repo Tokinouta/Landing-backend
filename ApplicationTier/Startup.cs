@@ -37,7 +37,7 @@ namespace ApplicationTier
                     .AllowCredentials());
             });
             services.AddSingleton(Configuration);
-            services.AddSingleton<IServiceProvider, ServiceProvider>();
+            services.AddSingleton<IServiceProvider, SimulationWrapper>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
