@@ -54,10 +54,10 @@ namespace ApplicationTier.Controllers
         // POST: HistoryController/Create
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public ActionResult Create([FromBody] string[] collection)
+        public ActionResult Create([FromBody]ddd collection)
         {
-            Console.WriteLine(collection.ToString());
-            var dateTimes = collection.Select(s =>
+            Console.WriteLine(collection);
+            var dateTimes = collection.selectedOptiont.Select(s =>
             {
                 if (DateTime.TryParse(s, out DateTime dt))
                 {
@@ -74,7 +74,7 @@ namespace ApplicationTier.Controllers
             List<IEnumerable<double>> data = new(t.Count());
             foreach (var item in t)
             {
-                data.Add(MatlabReader.Read<double>(item.PathToData, "Vk_record").Column(0)
+                data.Add(MatlabReader.Read<double>(item.PathToData, collection.dataItem).Column(0)
                         .ToList().Where((c, i) => i % 50 == 0));
             }
             //t.Select(s => );
@@ -90,7 +90,7 @@ namespace ApplicationTier.Controllers
         [HttpGet]
         public ActionResult Edit()
         {
-            var dates = _dbContext.BasicInformations.Take(3).Select(s => s.DateTime);
+            var dates = _dbContext.BasicInformations.Select(s => s.DateTime);
 
             return Ok(dates);
         }
@@ -132,4 +132,7 @@ namespace ApplicationTier.Controllers
             }
         }
     }
+
+    public class ddd
+    { public string dataItem { get; set; } public string[] selectedOptiont { get; set; } }
 }
