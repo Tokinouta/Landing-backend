@@ -54,21 +54,45 @@ namespace ApplicationTier.Controllers
         // POST: HistoryController/Create
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public ActionResult Create(object collection)
+        public ActionResult Create([FromBody] string[] collection)
         {
             Console.WriteLine(collection.ToString());
-            var t = _dbContext.BasicInformations.First();
-            var CalCount = MatlabReader.Read<double>(t.PathToData, "Vk_record").Column(0);
-            return Ok(new { collection, data = CalCount.ToList().Where((c, i) => i % 50 == 0) });
+            var dateTimes = collection.Select(s =>
+            {
+                if (DateTime.TryParse(s, out DateTime dt))
+                {
+                    return dt;
+                }
+                else
+                {
+                    // 这种时间应该是不会有对应的记录的
+                    return DateTime.MinValue;
+                }
+            });
+            var t = _dbContext.BasicInformations
+                .Where(s => dateTimes.Any(t => s.DateTime == t));
+            List<IEnumerable<double>> data = new(t.Count());
+            foreach (var item in t)
+            {
+                data.Add(MatlabReader.Read<double>(item.PathToData, "Vk_record").Column(0)
+                        .ToList().Where((c, i) => i % 50 == 0));
+            }
+            //t.Select(s => );
+            //var CalCount = MatlabReader.Read<double>(t.First().PathToData, "Vk_record").Column(0);
+            var dates = _dbContext.BasicInformations.Take(3).Select(s => s.DateTime);
+
+            return Ok(new { collection, data, dates });
 
             //return Ok(collection);
         }
 
         // GET: HistoryController/Edit/5
         [HttpGet]
-        public ActionResult Edit(int id)
+        public ActionResult Edit()
         {
-            return Ok();
+            var dates = _dbContext.BasicInformations.Take(3).Select(s => s.DateTime);
+
+            return Ok(dates);
         }
 
         // POST: HistoryController/Edit/5
