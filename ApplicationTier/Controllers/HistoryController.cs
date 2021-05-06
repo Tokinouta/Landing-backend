@@ -34,7 +34,7 @@ namespace ApplicationTier.Controllers
         {
             var t = _dbContext.BasicInformations.First();
             var CalCount = MatlabReader.Read<double>(t.PathToData, "Vk_record").Column(0);
-            return Ok(CalCount.ToArray());
+            return Ok(CalCount.ToList().Where((c, i) => i % 50 == 0));
         }
 
         // GET: HistoryController/Details/5
@@ -53,17 +53,15 @@ namespace ApplicationTier.Controllers
 
         // POST: HistoryController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        //[ValidateAntiForgeryToken]
+        public ActionResult Create(object collection)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return Ok();
-            }
+            Console.WriteLine(collection.ToString());
+            var t = _dbContext.BasicInformations.First();
+            var CalCount = MatlabReader.Read<double>(t.PathToData, "Vk_record").Column(0);
+            return Ok(new { collection, data = CalCount.ToList().Where((c, i) => i % 50 == 0) });
+
+            //return Ok(collection);
         }
 
         // GET: HistoryController/Edit/5

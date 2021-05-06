@@ -28,11 +28,11 @@ namespace ApplicationTier
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            Console.WriteLine(Configuration.GetSection("CorsUrl").Get<string[]>());
             services.AddCors(policy =>
             {
                 policy.AddPolicy("CorsPolicy", opt => opt
-                    .WithOrigins(Configuration["CorsUrl"])
+                    .WithOrigins(Configuration.GetSection("CorsUrl").Get<string[]>())
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
