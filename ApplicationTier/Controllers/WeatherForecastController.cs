@@ -89,6 +89,7 @@ namespace ApplicationTier.Controllers
         {
             return Ok(new
             {
+                _serviceProvider.Simulation.Configuration,
                 GuidanceControllerOptions = new
                 {
                     label = GetEnumNames<GuidanceConfig>(),
