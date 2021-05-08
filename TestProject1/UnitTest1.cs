@@ -1,6 +1,11 @@
 using CsharpVersion;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ModelEntities;
+using ModelEntities.Enumerations;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TestProject1
 {
@@ -10,7 +15,7 @@ namespace TestProject1
         [TestMethod]
         public void TestMethod1()
         {
-            ConcurrentQueue<double> cq = new();
+            ConcurrentQueue<DataToSend> cq = new();
             Simulation simulation = new();
             simulation.Simulate(cq);
             Assert.AreEqual(30714, simulation.Step_count);
@@ -19,7 +24,7 @@ namespace TestProject1
         [TestMethod]
         public void TestReset()
         {
-            ConcurrentQueue<double> cq = new();
+            ConcurrentQueue<DataToSend> cq = new();
             Simulation sim = new();
             sim.Simulate(cq);
             sim.Reset();
@@ -37,5 +42,18 @@ namespace TestProject1
             sim.Simulate(cq);
             Assert.AreEqual(30714, sim.Step_count);
         }
+
+        [TestMethod]
+        public void TestEnumToList()
+        {
+            var t = GetEnumList<GuidanceConfig>();
+            foreach (var item in t)
+            {
+                Console.WriteLine(item);
+            }
+        }
+
+        public static List<TEnum> GetEnumList<TEnum>() where TEnum : Enum
+            => ((TEnum[])Enum.GetValues(typeof(TEnum))).ToList();
     }
 }

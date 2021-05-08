@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using ModelEntities;
+using ModelEntities.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,8 +53,7 @@ namespace ApplicationTier.Controllers
             .ToArray();
         }
 
-        [HttpGet]
-        [Route("startSimulation")]
+        [HttpGet("startSimulation")]
         public OkResult Start()
         {
             Console.WriteLine("Simulation started.");
@@ -61,8 +62,7 @@ namespace ApplicationTier.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("test")]
+        [HttpGet("test")]
         public OkObjectResult Test()
         {
             //Console.WriteLine("Simulation started.");
@@ -71,12 +71,93 @@ namespace ApplicationTier.Controllers
             return Ok("this is a test");
         }
 
-        [HttpGet]
-        [Route("reset")]
+        [HttpGet("reset")]
         public IActionResult Reset()
         {
             _serviceProvider.Reset();
             return Ok();
         }
+
+        [HttpPost("config")]
+        public IActionResult SetConfig([FromBody] Configuration configuration)
+        {
+            return Ok(configuration);
+        }
+
+        [HttpGet("loadConfig")]
+        public IActionResult LoadConfigurationOptions()
+        {
+            return Ok(new
+            {
+                GuidanceControllerOptions = new
+                {
+                    label = GetEnumNames<GuidanceConfig>(),
+                    value = GetEnumValues<GuidanceConfig>()
+                },
+                AttitudeControllerOptions = new
+                {
+                    label = GetEnumNames<AttitudeConfig>(),
+                    value = GetEnumValues<AttitudeConfig>()
+                },
+                AngularRateControllerOptions = new
+                {
+                    label = GetEnumNames<AngularRateConfig>(),
+                    value = GetEnumValues<AngularRateConfig>()
+                },
+                DisturbanceObserverOptions = new
+                {
+                    label = GetEnumNames<DisturbanceObserverConfig>(),
+                    value = GetEnumValues<DisturbanceObserverConfig>()
+                },
+                GuidanceFilterOptions = new
+                {
+                    label = GetEnumNames<GuidanceFilters>(),
+                    value = GetEnumValues<GuidanceFilters>()
+                },
+                AttitudeFilterOptions = new
+                {
+                    label = GetEnumNames<AttitudeFilters>(),
+                    value = GetEnumValues<AttitudeFilters>()
+                },
+                UseAttitudeTrackingDifferentiatorOptions = new
+                {
+                    label = new string[] { "true", "false" },
+                    value = new bool[] { true, false }
+                },
+                TrajactoryConfigOptions = new
+                {
+                    label = GetEnumNames<TrajactoryType>(),
+                    value = GetEnumValues<TrajactoryType>()
+                },
+                UseDisturbanceTypeIOptions = new
+                {
+                    label = new string[] { "true", "false" },
+                    value = new bool[] { true, false }
+                },
+                IsWindEnabledOptions = new
+                {
+                    label = new string[] { "true", "false" },
+                    value = new bool[] { true, false }
+                },
+                IsDeckCompensationEnabledOptions = new
+                {
+                    label = new string[] { "true", "false" },
+                    value = new bool[] { true, false }
+                },
+                UseL1AdaptiveOptions = new
+                {
+                    label = new string[] { "true", "false" },
+                    value = new bool[] { true, false }
+                }
+            });
+        }
+
+        [NonAction]
+        public static List<TEnum> GetEnumValues<TEnum>() where TEnum : Enum
+            => ((TEnum[])Enum.GetValues(typeof(TEnum))).ToList();
+
+        [NonAction]
+        public static string[] GetEnumNames<TEnum>() where TEnum : Enum
+            => Enum.GetNames(typeof(TEnum));
     }
 }
