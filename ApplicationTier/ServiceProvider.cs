@@ -28,7 +28,7 @@ namespace ApplicationTier
 
     }
 
-    class SimulationWrapper : IServiceProvider
+    public class SimulationWrapper : IServiceProvider
     {
         public Simulation Simulation { get; set; }
         public ConcurrentQueue<DataToSend> DataQueue { get; set; }
@@ -92,12 +92,16 @@ namespace ApplicationTier
         {
             var ini = new Initialization()
             {
-                InitialPositionX = Simulation.Plane.Position[0],
-                InitialPositionY = Simulation.Plane.Position[1],
-                InitialPositionZ = Simulation.Plane.Position[2],
-                InitialAttitudePhi = Simulation.Plane.Phi,
-                InitialAttitudePsi = Simulation.Plane.Psi,
-                InitialAttitudeTheta = Simulation.Plane.Theta
+                X = Simulation.Plane.Position[0],
+                Y = Simulation.Plane.Position[1],
+                Z = Simulation.Plane.Position[2],
+                Phi = Simulation.Plane.Phi,
+                Psi = Simulation.Plane.Psi,
+                Theta = Simulation.Plane.Theta,
+                P = Simulation.Plane.P,
+                Q = Simulation.Plane.Q,
+                R = Simulation.Plane.R,
+                Alpha = Simulation.Plane.Alpha
             };
             //var conf = new ModelEntities.Configuration()
             //{
@@ -106,10 +110,11 @@ namespace ApplicationTier
             DataSendTimer.Start();
             Simulation.Simulate(DataQueue);
             Console.WriteLine(Simulation.Plane.Position.ToString("G40"));
-            //SaveToDatabase(ini, Simulation.Configuration);
+            SaveToDatabase(ini, Simulation.Configuration);
+            Thread.Sleep(5000);
         }
 
-        async public void SaveToDatabase(Initialization ini, ModelEntities.Configuration conf)
+        async public void SaveToDatabase(Initialization ini, Configuration conf)
         {
             string fileName = $"datalog\\{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.mat";
             await Task.Run(() =>

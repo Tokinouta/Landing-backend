@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\CsharpVersion\CsharpVersion.csproj" />
     <ProjectReference Include="..\..\HistoryDemo\HistoryDemo\HistoryDemo.csproj" />
     <ProjectReference Include="..\..\HistoryDemo\ModelEntities\ModelEntities.csproj" />
+    <ProjectReference Include="..\ApplicationTier\ApplicationTier.csproj" />
   </ItemGroup>
 
 </Project>

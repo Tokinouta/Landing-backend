@@ -1,4 +1,6 @@
+using ApplicationTier;
 using CsharpVersion;
+using HistoryDemo;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ModelEntities;
 using ModelEntities.Enumerations;
@@ -6,6 +8,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TestProject1
 {
@@ -13,12 +17,30 @@ namespace TestProject1
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestSimulate()
         {
             ConcurrentQueue<DataToSend> cq = new();
             Simulation simulation = new();
             simulation.Simulate(cq);
             Assert.AreEqual(30714, simulation.Step_count);
+        }
+
+        [TestMethod]
+        public void TestDatabase1()
+        {
+            ConcurrentQueue<DataToSend> cq = new();
+            SimulationWrapper simulation = new();
+            simulation.StartSimulation();
+            Assert.AreEqual(30714, simulation.Simulation.Step_count);
+            
+            using AppDbContext db = new AppDbContext();
+            Thread.Sleep(5000);
+            var t = db.BasicInformations.OrderBy(s => s.DateTime).Last();
+            foreach (var item in t.GetType().GetProperties())
+            {
+                Console.WriteLine(item.GetValue(t));
+            }
+
         }
 
         [TestMethod]

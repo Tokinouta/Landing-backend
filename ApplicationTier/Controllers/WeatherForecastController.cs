@@ -81,6 +81,7 @@ namespace ApplicationTier.Controllers
         [HttpPost("config")]
         public IActionResult SetConfig([FromBody] Configuration configuration)
         {
+            _serviceProvider.Simulation = new(configuration);
             return Ok(configuration);
         }
 
