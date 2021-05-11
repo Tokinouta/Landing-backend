@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,10 +35,17 @@ namespace ApplicationTier
         public ConcurrentQueue<DataToSend> DataQueue { get; set; }
         public System.Timers.Timer DataSendTimer { get; set; }
         public HubConnection Connection { get; set; }
+        UdpClient udpClient;
 
         public SimulationWrapper()
         {
             Simulation = new Simulation();
+            udpClient = new();
+            Simulation.DataSending += () =>
+            {
+                var sendBytes = Simulation.DataToSend;
+                udpClient.Send(sendBytes, sendBytes.Length, "localhost", 33333);
+            };
             DataSendTimer = new System.Timers.Timer(100);
             DataSendTimer.Elapsed += (sender, e) =>
             {
