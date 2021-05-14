@@ -74,6 +74,7 @@ namespace ApplicationTier.Controllers
             List<IEnumerable<double>> data = new(t.Count());
             foreach (var item in t)
             {
+                // https://stackoverflow.com/questions/267033/getting-odd-even-part-of-a-sequence-with-linq
                 data.Add(MatlabReader.Read<double>(item.PathToData, collection.dataItem).Column(0)
                         .ToList().Where((c, i) => i % 50 == 0));
             }

@@ -154,6 +154,7 @@ namespace ApplicationTier.Controllers
             });
         }
 
+        // https://stackoverflow.com/questions/801029/how-to-get-all-values-of-an-enum
         [NonAction]
         public static List<TEnum> GetEnumValues<TEnum>() where TEnum : Enum
             => ((TEnum[])Enum.GetValues(typeof(TEnum))).ToList();

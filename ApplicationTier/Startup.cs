@@ -37,6 +37,8 @@ namespace ApplicationTier
                     .AllowAnyMethod()
                     .AllowCredentials());
             });
+            
+            // https://stackoverflow.com/questions/38359219/access-appsettings-json-values-in-controller-classes
             services.AddSingleton(Configuration);
             services.AddSingleton<IServiceProvider, SimulationWrapper>();
             services.AddDbContext<AppDbContext>();
