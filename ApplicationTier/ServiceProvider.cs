@@ -109,7 +109,12 @@ namespace ApplicationTier
                 P = Simulation.Plane.P,
                 Q = Simulation.Plane.Q,
                 R = Simulation.Plane.R,
-                Alpha = Simulation.Plane.Alpha
+                Alpha = Simulation.Plane.Alpha,
+                Vk = Simulation.Plane.Vk,
+                XShip = Simulation.Ship.Position[0],
+                YShip = Simulation.Ship.Position[1],
+                ZShip = Simulation.Ship.Position[2],
+                PsiShip = Simulation.Ship.Psi
             };
             //var conf = new ModelEntities.Configuration()
             //{
