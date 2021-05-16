@@ -83,6 +83,13 @@ namespace ApplicationTier.Controllers
         {
             _serviceProvider.Simulation = new(configuration);
             return Ok(configuration);
+        }      
+        
+        [HttpPost("initial")]
+        public IActionResult SetInitial([FromBody] Initialization initialization)
+        {
+            //_serviceProvider.Simulation = new(configuration);
+            return Ok(initialization);
         }
 
         [HttpGet("loadConfig")]
@@ -152,6 +159,12 @@ namespace ApplicationTier.Controllers
                     value = new bool[] { true, false }
                 }
             });
+        }
+
+        [HttpGet("loadInitial")]
+        public IActionResult LoadInitializations()
+        {
+            return Ok(_serviceProvider.Simulation.SimulationInitialization);
         }
 
         // https://stackoverflow.com/questions/801029/how-to-get-all-values-of-an-enum
