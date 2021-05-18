@@ -49,7 +49,7 @@ namespace ApplicationTier
                 var sendBytes = Simulation.DataToSend;
                 udpClient.Send(sendBytes, sendBytes.Length, "localhost", 33333);
             };
-            DataSendTimer = new System.Timers.Timer(10);
+            DataSendTimer = new System.Timers.Timer(125);
             DataSendTimer.Elapsed += SendData2;
             DataQueue = new ConcurrentQueue<DataToSend>();
             //Simulation.Record.SaveToDatabase += SaveToDatabase;
@@ -97,9 +97,11 @@ namespace ApplicationTier
             lock (Simulation)
             {
                 shouldStop = !Simulation.Simulate50(DataQueue);
+                Console.WriteLine(Simulation.Detect());           
+                Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+
             }
-            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
-            
+
             if (shouldStop)
             {
                 Console.WriteLine("inside if2");
@@ -136,7 +138,7 @@ namespace ApplicationTier
                 PsiShip = Simulation.Ship.Psi
             };
             DataSendTimer.Start();
-            Thread.Sleep(20000);
+            //Thread.Sleep(20000);
         }
 
         public void StartSimulation()
@@ -185,6 +187,7 @@ namespace ApplicationTier
         {
             Simulation.Reset();
             DataQueue.Clear();
+            DataSendTimer.Stop();
         }
     }
 }

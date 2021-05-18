@@ -26,7 +26,7 @@ namespace TestProject1
             //serviceProvider.DataSendTimer.Elapsed -= serviceProvider.SendData;
             //serviceProvider.DataSendTimer.Elapsed += serviceProvider.SendData2;
             serviceProvider.StartSimulation2();
-            //Thread.Sleep(5000);
+            Thread.Sleep(20000);
         }
     }
 }
