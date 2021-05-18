@@ -22,8 +22,10 @@ namespace ApplicationTier
         public HubConnection Connection { get; set; }
 
         public void StartHubConnection(string hubUrl);
-        public Task SendData();
+        public void SendData(object sender, EventArgs e);
+        public void SendData2(object sender, EventArgs e);
         public void StartSimulation();
+        public void StartSimulation2();
         public void Reset();
         public void SaveToDatabase(Initialization ini, ModelEntities.Configuration conf);
 
@@ -36,6 +38,7 @@ namespace ApplicationTier
         public System.Timers.Timer DataSendTimer { get; set; }
         public HubConnection Connection { get; set; }
         UdpClient udpClient;
+        Initialization ini;
 
         public SimulationWrapper()
         {
@@ -46,19 +49,8 @@ namespace ApplicationTier
                 var sendBytes = Simulation.DataToSend;
                 udpClient.Send(sendBytes, sendBytes.Length, "localhost", 33333);
             };
-            DataSendTimer = new System.Timers.Timer(100);
-            DataSendTimer.Elapsed += (sender, e) =>
-            {
-                if (DataQueue.TryDequeue(out DataToSend data))
-                {
-                    Connection.InvokeAsync("SendData", "user", data);
-                }
-                if (DataQueue.IsEmpty)
-                {
-                    DataSendTimer.Stop();
-                    Console.WriteLine("Timer Stoped");
-                }
-            };
+            DataSendTimer = new System.Timers.Timer(10);
+            DataSendTimer.Elapsed += SendData2;
             DataQueue = new ConcurrentQueue<DataToSend>();
             //Simulation.Record.SaveToDatabase += SaveToDatabase;
         }
@@ -85,20 +77,71 @@ namespace ApplicationTier
             }
         }
 
-        public Task SendData()
+        public void SendData(object sender, EventArgs e)
         {
-            return new Task(() =>
+            if (DataQueue.TryDequeue(out DataToSend data))
             {
-                if (DataQueue.TryDequeue(out DataToSend data))
-                {
-                    Connection.InvokeAsync("SendData", "user", data);
-                }
-            });
+                Connection.InvokeAsync("SendData", "user", data);
+            }
+            if (DataQueue.IsEmpty)
+            {
+                DataSendTimer.Stop();
+                Console.WriteLine("Timer Stoped");
+            }
+        }
+
+        public void SendData2(object sender, EventArgs e)
+        {
+            //Console.WriteLine("senddara2 called");
+            bool shouldStop;
+            lock (Simulation)
+            {
+                shouldStop = !Simulation.Simulate50(DataQueue);
+            }
+            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+            
+            if (shouldStop)
+            {
+                Console.WriteLine("inside if2");
+                DataSendTimer.Stop();
+                Console.WriteLine("Timer Stoped");
+                Console.WriteLine(Simulation.Step_count);
+                Console.WriteLine(Simulation.Plane.Position.ToString("G40"));
+                //SaveToDatabase(ini, Simulation.Configuration);
+            }if (DataQueue.TryDequeue(out DataToSend data))
+            {
+                Console.WriteLine("tried dequeue");
+                Connection.InvokeAsync("SendData", "user", data);
+            }
+        }
+
+        public void StartSimulation2()
+        {
+            ini = new Initialization()
+            {
+                X = Simulation.Plane.Position[0],
+                Y = Simulation.Plane.Position[1],
+                Z = Simulation.Plane.Position[2],
+                Phi = Simulation.Plane.Phi,
+                Psi = Simulation.Plane.Psi,
+                Theta = Simulation.Plane.Theta,
+                P = Simulation.Plane.P,
+                Q = Simulation.Plane.Q,
+                R = Simulation.Plane.R,
+                Alpha = Simulation.Plane.Alpha,
+                Vk = Simulation.Plane.Vk,
+                XShip = Simulation.Ship.Position[0],
+                YShip = Simulation.Ship.Position[1],
+                ZShip = Simulation.Ship.Position[2],
+                PsiShip = Simulation.Ship.Psi
+            };
+            DataSendTimer.Start();
+            Thread.Sleep(20000);
         }
 
         public void StartSimulation()
         {
-            var ini = new Initialization()
+            ini = new Initialization()
             {
                 X = Simulation.Plane.Position[0],
                 Y = Simulation.Plane.Position[1],

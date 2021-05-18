@@ -57,7 +57,7 @@ namespace ApplicationTier.Controllers
         public OkResult Start()
         {
             Console.WriteLine("Simulation started.");
-            _serviceProvider.StartSimulation();
+            _serviceProvider.StartSimulation2();
             Console.WriteLine("Simulation Finished.");
             return Ok();
         }
